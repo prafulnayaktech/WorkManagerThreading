@@ -18,18 +18,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
+import androidx.work.*
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.MetadataChanges
 import com.techolution.firestore.databinding.ActivityNoteBinding
-import com.techolution.firestore.services.CloudWorker
-import com.techolution.firestore.services.NoteData
-import com.techolution.firestore.services.createInputData
+import com.techolution.firestore.services.*
 import timber.log.Timber
 import java.io.*
 import java.util.*
@@ -69,6 +64,7 @@ class NoteActivity : AppCompatActivity() {
         }
 
         binding.save.setOnClickListener {
+            Log.i("thred_"," :"+Thread.currentThread().name)
             Toast.makeText(this,"Saved",Toast.LENGTH_LONG).show()
             val data = NoteData(binding.title.text.toString(), binding.desc.text.toString(), binding.other.text.toString(),pathI.toString())
             val syncBuilder = OneTimeWorkRequestBuilder<CloudWorker>()

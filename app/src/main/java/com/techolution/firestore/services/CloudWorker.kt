@@ -29,6 +29,7 @@ class CloudWorker(context: Context, workerParams: WorkerParameters) :
 
     @SuppressLint("LogNotTimber")
     override fun doWork(): Result {
+        Log.i("thred_dowork"," :"+Thread.currentThread().name)
         val appContext = applicationContext
         val dataString = inputData.getString(KEY_NOTE_DATA)
         val data = Gson().fromJson(dataString, NoteData::class.java)
@@ -42,7 +43,7 @@ class CloudWorker(context: Context, workerParams: WorkerParameters) :
             Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
         )
 
-//        val picture = BitmapFactory.decodeStream(resolver.openInputStream(Uri.parse(data.uri)))
+
         val f = File(data.uri, "profile.jpg")
         val picture = BitmapFactory.decodeStream(FileInputStream(f))
         // Create a storage reference from our app
@@ -54,12 +55,10 @@ class CloudWorker(context: Context, workerParams: WorkerParameters) :
         picture.compress(Bitmap.CompressFormat.JPEG, 100, baos)
         val imageDataX: ByteArray = baos.toByteArray()
 
-        // Create a child reference
-// imagesRef now points to "images"
-//        var imagesRef: StorageReference? = storageRef.child("images")
         var pathX = "images/"+System.currentTimeMillis().toString()+".jpg"
         val mountainImagesRef = storageRef.child(pathX)
         val uploadTask = mountainImagesRef.putBytes(imageDataX)
+
         uploadTask.addOnSuccessListener {
                 Log.i("sync_","Image uploaded"+ it.metadata!!.path+"   :  "+it.metadata!!.name)
             data.uri= it.metadata!!.path
@@ -69,8 +68,8 @@ class CloudWorker(context: Context, workerParams: WorkerParameters) :
                     Log.i("sync_","Sync Succes")
                     if(isStopped)
                         Log.i("sync_","Worker Stopped")
-//                else
-//                 saveUrl()
+                    else
+                        saveUrl()
 
                 }.addOnFailureListener {
                     Log.i("sync_","Sync Succes")
@@ -78,14 +77,7 @@ class CloudWorker(context: Context, workerParams: WorkerParameters) :
         }.addOnFailureListener{
             Log.e("sync_","Image not uploaded"+it.toString())
         }
-
-// Child references can also take paths
-// spaceRef now points to "images/space.jpg
-// imagesRef still points to "images"
-//        var spaceRef = storageRef.child("images/space.jpg")
-
         Timber.i("sync_data: $dataString")
-
 
         Log.i("sync_","Called before firestore"+dataString)
         return Result.success()
@@ -93,8 +85,8 @@ class CloudWorker(context: Context, workerParams: WorkerParameters) :
     }
 
     private fun saveUrl() {
-        Log.i("sync_","sleeping for 10 sec")
-        sleep(2000)
+        Log.i("sync_","sleeping for 10 sec. thread_ "+Thread.currentThread().name)
+        sleep(15000)
         if(isStopped)
             Log.i("sync_","Worker Stopped")
         else
